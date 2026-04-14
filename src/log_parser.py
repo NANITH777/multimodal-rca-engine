@@ -88,7 +88,14 @@ class RegexLogParser:
         self.total_lines = 0
 
         with open(filepath, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines() if max_lines is None else [next(f) for _ in range(max_lines)]
+            if max_lines is None:
+                lines = f.readlines()
+            else:
+                lines = []
+                for i, line in enumerate(f):
+                    if i >= max_lines:
+                        break
+                    lines.append(line)
 
         iterator = tqdm(lines, desc=f"Parsing {filepath.name}") if show_progress else lines
 

@@ -1,0 +1,15 @@
+STDOUT:
+Name: drain3
+Version: 0.9.11
+Summary: Persistent & streaming log template miner
+Home-page: https://github.com/IBM/Drain3
+Author: IBM Research Haifa
+Author-email: david.ohana@ibm.com
+License: MIT
+Location: C:\Users\Fulchany NANITH\AppData\Roaming\Python\Python313\site-packages
+Requires: cachetools, jsonpickle
+Required-by: 
+
+STDERR:
+
+RC:0

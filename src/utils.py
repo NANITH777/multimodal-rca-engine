@@ -103,12 +103,15 @@ def download_and_extract_dataset(dataset_key, config=None):
     """
     Download and extract a dataset by its key from the config.
     
+    Archives may extract into a named subdirectory (e.g., HDFS_v1/)
+    or directly into the parent directory (flat). This function handles both.
+    
     Args:
         dataset_key: One of 'hdfs_v1', 'bgl', 'openstack'
         config: Optional pre-loaded config dict
     
     Returns:
-        Path to extracted data directory
+        Path to the directory containing the extracted files
     """
     if config is None:
         config = load_config()
@@ -134,13 +137,118 @@ def download_and_extract_dataset(dataset_key, config=None):
     # Download
     download_file(url, archive_path)
 
-    # Extract if not already done
-    if not extract_dir.exists() or not any(extract_dir.iterdir()):
-        extract_archive(archive_path, RAW_DIR)
+    # Extract — check if a named subdirectory exists OR files are flat
+    if extract_dir.exists() and any(extract_dir.iterdir()):
+        print(f"⏭️  Already extracted: {name} (in subdirectory)")
+        return extract_dir
+    
+    # Check if files are already extracted flat into RAW_DIR
+    flat_files = get_dataset_files(dataset_key)
+    if flat_files:
+        print(f"⏭️  Already extracted: {name} (flat in raw/)")
+        return RAW_DIR
+    
+    # Extract
+    extract_archive(archive_path, RAW_DIR)
+    
+    # After extraction, check if files went into subdirectory or flat
+    if extract_dir.exists() and any(extract_dir.iterdir()):
+        return extract_dir
     else:
-        print(f"⏭️  Already extracted: {name}")
+        return RAW_DIR
 
-    return extract_dir
+
+# File patterns for each dataset (used when archives extract flat)
+DATASET_FILE_PATTERNS = {
+    "hdfs_v1": {
+        "log_files": ["HDFS.log"],
+        "label_files": ["anomaly_label.csv", "anomaly_labels.txt"],
+        "extra_dirs": ["preprocessed"],
+    },
+    "bgl": {
+        "log_files": ["BGL.log"],
+        "label_files": [],
+    },
+    "openstack": {
+        "log_files": ["openstack_abnormal.log", "openstack_normal1.log", "openstack_normal2.log"],
+        "label_files": [],
+    },
+}
+
+
+def get_dataset_files(dataset_key):
+    """
+    Find files belonging to a specific dataset, whether extracted
+    into a subdirectory or flat into data/raw/.
+    
+    Args:
+        dataset_key: One of 'hdfs_v1', 'bgl', 'openstack'
+    
+    Returns:
+        dict with keys 'log_files' and 'label_files', each a list of Paths.
+        Returns empty dict if no files found.
+    """
+    patterns = DATASET_FILE_PATTERNS.get(dataset_key, {})
+    if not patterns:
+        return {}
+    
+    result = {"log_files": [], "label_files": []}
+    
+    config = load_config()
+    name = config["loghub"]["datasets"][dataset_key]["name"]
+    
+    # Check subdirectory first
+    subdir = RAW_DIR / name
+    search_dirs = [subdir, RAW_DIR]
+    
+    # Also check 'preprocessed' subdirectory for HDFS
+    preprocessed_dir = RAW_DIR / "preprocessed"
+    if preprocessed_dir.exists():
+        search_dirs.append(preprocessed_dir)
+    
+    for pattern_key in ["log_files", "label_files"]:
+        for filename in patterns.get(pattern_key, []):
+            for search_dir in search_dirs:
+                candidate = search_dir / filename
+                if candidate.exists():
+                    result[pattern_key].append(candidate)
+                    break
+    
+    # Return empty if nothing found
+    if not result["log_files"] and not result["label_files"]:
+        return {}
+    
+    return result
+
+
+def get_dataset_dir(dataset_key, config=None):
+    """
+    Get the directory containing a dataset's files.
+    Handles both subdirectory and flat extraction layouts.
+    
+    Args:
+        dataset_key: One of 'hdfs_v1', 'bgl', 'openstack'
+        config: Optional pre-loaded config dict
+    
+    Returns:
+        Path to directory containing the dataset files
+    """
+    if config is None:
+        config = load_config()
+    
+    name = config["loghub"]["datasets"][dataset_key]["name"]
+    subdir = RAW_DIR / name
+    
+    # Prefer subdirectory if it exists
+    if subdir.exists() and any(subdir.iterdir()):
+        return subdir
+    
+    # Otherwise check flat layout
+    files = get_dataset_files(dataset_key)
+    if files:
+        return RAW_DIR
+    
+    return subdir  # Return expected path even if not found
 
 
 def read_log_file(filepath, max_lines=None, encoding="utf-8"):
