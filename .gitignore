@@ -1,0 +1,79 @@
+# ============================================
+# Multimodal RCA Engine — .gitignore
+# ============================================
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# ---------- Virtual Environments ----------
+.env
+.venv
+env/
+venv/
+ENV/
+
+# ---------- Jupyter Notebooks ----------
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# ---------- Data (LARGE FILES) ----------
+data/
+*.csv
+*.tsv
+*.log
+*.gz
+*.tar
+*.tar.gz
+*.zip
+*.bz2
+*.7z
+*.parquet
+*.h5
+*.hdf5
+
+# ---------- Model Artifacts ----------
+models/
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+*.bin
+*.safetensors
+
+# ---------- Results & Outputs ----------
+results/
+outputs/
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- OS Files ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Secrets & Config ----------
+.env
+.env.local
+*.key
+*.pem
+secrets/
+
+# ---------- Misc ----------
+*.bak
+*.tmp
+*.temp
+read_pdf.py

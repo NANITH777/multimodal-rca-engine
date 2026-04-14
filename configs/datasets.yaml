@@ -1,0 +1,70 @@
+# ============================================
+# Dataset Configuration — Multimodal RCA Engine
+# ============================================
+
+loghub:
+  description: "LogHub — A large collection of system log datasets (ISSRE'23)"
+  repository: "https://github.com/logpai/loghub"
+  citation: "Jieming Zhu et al., Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics, ISSRE 2023"
+
+  datasets:
+    hdfs_v1:
+      name: "HDFS_v1"
+      url: "https://zenodo.org/records/8196385/files/HDFS_v1.zip?download=1"
+      description: "Hadoop Distributed File System logs with anomaly labels"
+      size: "~1.5GB"
+      labels: true
+      label_file: "anomaly_label.csv"
+      format: "unstructured text logs"
+      log_pattern: '<Date> <Time> <Pid> <Level> <Component>: <Content>'
+      priority: 1  # Premier dataset à utiliser
+
+    bgl:
+      name: "BGL"
+      url: "https://zenodo.org/records/8196385/files/BGL.zip?download=1"
+      description: "Blue Gene/L supercomputer logs with alert labels"
+      size: "~700MB"
+      labels: true
+      format: "unstructured text logs"
+      log_pattern: '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>'
+      priority: 2
+
+    openstack:
+      name: "OpenStack"
+      url: "https://zenodo.org/records/8196385/files/OpenStack.tar.gz?download=1"
+      description: "OpenStack cloud platform logs"
+      size: "~60MB"
+      labels: true
+      format: "unstructured text logs"
+      log_pattern: '<Logrecord> <Date> <Time> <Pid> <Level> <Component> <ADDR> <Content>'
+      priority: 3
+
+alibaba:
+  description: "Alibaba Cluster Trace — Production cluster data"
+  repository: "https://github.com/alibaba/clusterdata"
+
+  datasets:
+    microservices_v2022:
+      name: "cluster-trace-microservices-v2022"
+      description: "Runtime metrics of 28K+ microservices over 13 days"
+      tables:
+        - name: "Node"
+          columns: ["timestamp", "nodeid", "cpu_utilization", "memory_utilization"]
+          interval: "60s"
+        - name: "MSResource"
+          columns: ["timestamp", "msname", "msinstanceid", "nodeid", "cpu_utilization", "memory_utilization"]
+          interval: "60s"
+        - name: "MSRTMCR"
+          columns: ["timestamp", "msname", "msinstanceid", "nodeid", "providerrpc_rt", "providerrpc_mcr", "consumerrpc_rt", "consumerrpc_mcr"]
+          interval: "60s"
+        - name: "MSCallGraph"
+          columns: ["timestamp", "traceid", "service", "rpc_id", "um", "uminstanceid", "rpctype", "interface", "dm", "dminstanceid", "rt"]
+      download_script: "bash fetchData.sh start_date=0d0 end_date=0d1"
+      total_size: "~2TB (13 days)"
+      sample_size: "~8GB (1 hour)"
+      priority: 4
+
+    microservices_v2021:
+      name: "cluster-trace-microservices-v2021"
+      description: "20K+ microservices over 12 hours (lighter version)"
+      priority: 5
