@@ -35,8 +35,7 @@ tqdm>=4.65.0
 pyyaml>=6.0
 requests>=2.31.0
 
-# (Future) LLM Integration
-# openai>=1.0.0
-# google-generativeai>=0.3.0
-# transformers>=4.35.0
-# torch>=2.0.0
+# LLM Integration
+google-generativeai>=0.8.0
+python-dotenv>=1.0.0
+requests>=2.31.0
