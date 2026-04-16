@@ -83,7 +83,7 @@ Open notebooks in order: `01` → `02` → `03` → `04`
 
 ## 👥 Team
 - **Supervisor**: Doç. Dr. Süleyman Eken — Kocaeli University
-- **Researcher**: Canberk Duman — PhD Student
+- **Researcher**: 
 
 ---
 *Kocaeli Üniversitesi — TÜBİTAK Project*
