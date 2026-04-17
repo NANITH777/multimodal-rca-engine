@@ -82,3 +82,6 @@ read_pdf.py
 _*
 !__init__.py
 !__pycache__/
+
+# ---------- Gizli Raporlar (GitHub'da yayınlanmaz) ----------
+report/
