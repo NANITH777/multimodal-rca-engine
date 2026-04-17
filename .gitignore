@@ -25,7 +25,7 @@ ENV/
 *.ipynb_checkpoints/
 
 # ---------- Data (LARGE FILES) ----------
-data/
+data/*
 *.csv
 *.tsv
 *.log
@@ -87,3 +87,9 @@ _*
 # ---------- Gizli Raporlar (GitHub'da yayınlanmaz) ----------
 report/
 docs/
+
+# ---------- Allowed Data Folders ----------
+!data/parsed/
+!data/processed/
+!data/parsed/**
+!data/processed/**

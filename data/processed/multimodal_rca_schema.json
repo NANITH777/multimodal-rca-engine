@@ -1,0 +1,66 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-14T21:00:00Z",
+  "incident_id": "INC-2026-001",
+  "llm_analysis": {
+    "source": "system_logs",
+    "model": "gpt-4 / gemini-1.5-pro",
+    "classification": "ANOMALY",
+    "confidence": 0.92,
+    "root_cause": "DataNode disk failure causing block replication failure",
+    "error_chain": [
+      {
+        "event": "E001",
+        "desc": "IOException on DataNode disk write"
+      },
+      {
+        "event": "E003",
+        "desc": "Block replication failed for blk_xxx"
+      },
+      {
+        "event": "E007",
+        "desc": "NameNode marks DataNode as dead"
+      }
+    ],
+    "affected_components": [
+      "DataNode",
+      "NameNode",
+      "BlockManager"
+    ]
+  },
+  "vlm_analysis": {
+    "source": "monitoring_dashboards",
+    "model": "gpt-4-vision / gemini-1.5-pro-vision",
+    "observations": [
+      {
+        "metric": "disk_io",
+        "finding": "Spike in disk I/O errors at 14:23"
+      },
+      {
+        "metric": "cpu_usage",
+        "finding": "Normal CPU \u2014 not a compute issue"
+      },
+      {
+        "metric": "network_throughput",
+        "finding": "Drop in replication bandwidth"
+      }
+    ],
+    "visual_anomaly_score": 0.87
+  },
+  "multimodal_fusion": {
+    "strategy": "weighted_evidence_aggregation",
+    "final_root_cause": "Physical disk failure on DataNode-7, causing cascading block replication failures",
+    "combined_confidence": 0.95,
+    "cross_modal_correlation": {
+      "log_error_time": "14:23:15",
+      "metric_anomaly_time": "14:23:00",
+      "temporal_alignment": "strong (15s delta)"
+    },
+    "severity": "HIGH",
+    "remediation": [
+      "Immediately decommission DataNode-7",
+      "Trigger manual block replication for affected blocks",
+      "Replace failed disk and recommission node"
+    ]
+  }
+}

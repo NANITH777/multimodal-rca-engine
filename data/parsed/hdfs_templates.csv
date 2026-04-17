@@ -1,0 +1,21 @@
+cluster_id,template,count
+1,Receiving block <*> src: <*> dest: <*>,23611
+5,BLOCK* NameSystem.addStoredBlock: blockMap updated: <*> is added to <*> size <*>,22287
+4,Received block <*> of size <*> from <*>,22225
+3,PacketResponder <*> for block <*> terminating,22224
+2,BLOCK* NameSystem.allocateBlock: <*> <*>,7940
+13,Verification succeeded for <*>,1088
+10,<*> Served block <*> to <*>,407
+16,writeBlock <*> received exception java.io.IOException: Could not read from stream,62
+6,Received block <*> src: <*> dest: <*> of size <*>,29
+7,<*> block <*> to <*>,25
+18,Receiving empty packet for block <*>,24
+17,Deleting block <*> file <*>,22
+11,BLOCK* ask <*> to replicate <*> to datanode(s) <*>,22
+12,<*> Starting thread to transfer block <*> to <*>,22
+9,BLOCK* ask <*> to replicate <*> to datanode(s) <*> <*>,4
+8,<*> Starting thread to transfer block <*> to <*> <*>,4
+14,writeBlock blk_-3102267849859399193 received exception java.net.SocketTimeoutException,1
+15,PacketResponder blk_-3102267849859399193 2 Exception java.io.EOFException,1
+19,Exception in receiveBlock for block blk_-3102267849859399193 java.io.IOException: Connection reset by peer,1
+20,writeBlock blk_-3102267849859399193 received exception java.io.IOException: Connection reset by peer,1

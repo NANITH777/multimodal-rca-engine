@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "phase": "1 - Log Processing",
+  "modules": {
+    "log_parsing": {
+      "methods": [
+        "regex",
+        "drain"
+      ],
+      "drain_config": {
+        "depth": 4,
+        "sim_th": 0.4
+      }
+    },
+    "feature_extraction": {
+      "methods": [
+        "event_count",
+        "tfidf",
+        "sequential"
+      ],
+      "session_grouping": [
+        "block_id",
+        "time_window"
+      ]
+    },
+    "anomaly_detection": {
+      "baselines": [
+        "isolation_forest",
+        "lof"
+      ],
+      "llm_based": "pending_phase_2"
+    }
+  },
+  "datasets": {
+    "primary": "HDFS_v1 (with anomaly labels)",
+    "secondary": [
+      "BGL",
+      "OpenStack"
+    ],
+    "trace_data": "Alibaba microservices-v2022"
+  },
+  "next_phase": {
+    "llm_integration": "Call LLM APIs for semantic analysis",
+    "vlm_module": "Visual metric analysis with VLM",
+    "fusion": "Multimodal data fusion for RCA"
+  }
+}
