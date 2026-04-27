@@ -25,6 +25,8 @@ ENV/
 *.ipynb_checkpoints/
 
 # ---------- Data (LARGE FILES) ----------
+data/multimodal_dataset/
+data/raw/
 data/*
 *.csv
 *.tsv

@@ -1,0 +1,517 @@
+# ============================================================
+# Anomaly Scenarios Configuration — from data.pdf (Ek Tablo 3 & 4)
+# 11 layers × 2 scenarios = 22 total anomaly scenarios
+# ============================================================
+
+layers:
+  cdn:
+    name: "CDN"
+    name_tr: "CDN"
+    metrics:
+      - request_count
+      - response_time_ms
+      - cache_hit_ratio
+      - traffic_mbps
+      - error_rate
+
+    scenarios:
+      - id: "CDN_001"
+        name: "Sudden Traffic Spike"
+        name_tr: "Ani Trafik Artışı"
+        description: "Sudden traffic increase on CDN, possibly indicating a DDoS attack."
+        detection_params: ["request_count", "traffic_mbps", "error_rate"]
+        root_cause: "Potential DDoS attack or temporary spike"
+        root_cause_tr: "Potansiyel DDoS saldırısı veya geçici yoğunluk"
+        root_cause_category: "network"
+        severity: "critical"
+        remediation:
+          - "Apply IP restrictions on firewall"
+          - "Trigger rate limiting script on CDN"
+        anomaly_type: "spike"
+        affected_metrics:
+          request_count: { multiplier: [3.0, 10.0], pattern: "sudden_spike" }
+          traffic_mbps: { multiplier: [2.5, 8.0], pattern: "sudden_spike" }
+          error_rate: { additive: [0.05, 0.25], pattern: "gradual_rise" }
+
+      - id: "CDN_002"
+        name: "Response Time Increase"
+        name_tr: "Yanıt Süresinde Artış"
+        description: "CDN response time suddenly increases, indicating performance degradation."
+        detection_params: ["response_time_ms", "cache_hit_ratio", "error_rate"]
+        root_cause: "CDN performance degradation, server overload"
+        root_cause_tr: "CDN performans düşüşü, sunucu yoğunluğu"
+        root_cause_category: "software"
+        severity: "high"
+        remediation:
+          - "Clear CDN cache"
+          - "Redirect traffic to alternative servers"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          response_time_ms: { multiplier: [2.0, 5.0], pattern: "gradual_rise" }
+          cache_hit_ratio: { multiplier: [0.3, 0.6], pattern: "gradual_drop" }
+          error_rate: { additive: [0.02, 0.10], pattern: "gradual_rise" }
+
+  firewall:
+    name: "Firewall"
+    name_tr: "Güvenlik Duvarı (Firewall)"
+    metrics:
+      - connection_attempts
+      - blocked_connections
+      - allowed_traffic_mbps
+      - error_rate
+      - bandwidth_mbps
+
+    scenarios:
+      - id: "FW_001"
+        name: "Increased Blocked Connections"
+        name_tr: "Artan Engellenmiş Bağlantılar"
+        description: "Abnormal increase in blocked connections, indicating potential attack or malicious activity."
+        detection_params: ["blocked_connections", "connection_attempts"]
+        root_cause: "Potential attack or misconfiguration"
+        root_cause_tr: "Olası saldırı veya hatalı konfigürasyon"
+        root_cause_category: "network"
+        severity: "high"
+        remediation:
+          - "Temporarily block related IP/port"
+          - "Update firewall rules"
+        anomaly_type: "spike"
+        affected_metrics:
+          blocked_connections: { multiplier: [3.0, 15.0], pattern: "sudden_spike" }
+          connection_attempts: { multiplier: [2.0, 8.0], pattern: "sudden_spike" }
+
+      - id: "FW_002"
+        name: "High Bandwidth Usage"
+        name_tr: "Yüksek Bant Genişliği Kullanımı"
+        description: "Sudden increase in bandwidth usage, firewall facing heavy traffic."
+        detection_params: ["bandwidth_mbps", "connection_attempts"]
+        root_cause: "Excessive traffic or potential data exfiltration"
+        root_cause_tr: "Aşırı trafik veya olası sızıntı"
+        root_cause_category: "network"
+        severity: "high"
+        remediation:
+          - "Trigger bandwidth limit control script"
+          - "Analyze network traffic"
+        anomaly_type: "sustained_high"
+        affected_metrics:
+          bandwidth_mbps: { multiplier: [2.5, 6.0], pattern: "sustained_high" }
+          connection_attempts: { multiplier: [1.5, 4.0], pattern: "gradual_rise" }
+
+  proxy:
+    name: "Proxy"
+    name_tr: "Proxy"
+    metrics:
+      - request_rate
+      - response_time_ms
+      - error_rate
+      - load_average
+      - connection_count
+
+    scenarios:
+      - id: "PRX_001"
+        name: "Error Rate Surge"
+        name_tr: "Hata Oranında Yükselme"
+        description: "Proxy error rate rising above normal, indicating server overload or misconfiguration."
+        detection_params: ["error_rate", "load_average", "connection_count"]
+        root_cause: "Proxy configuration issue or excessive load"
+        root_cause_tr: "Proxy yapılandırma sorunu veya aşırı yük"
+        root_cause_category: "software"
+        severity: "high"
+        remediation:
+          - "Restart proxy server"
+          - "Trigger connection limit script"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          error_rate: { additive: [0.05, 0.30], pattern: "gradual_rise" }
+          load_average: { multiplier: [1.5, 3.0], pattern: "gradual_rise" }
+          connection_count: { multiplier: [2.0, 5.0], pattern: "sustained_high" }
+
+      - id: "PRX_002"
+        name: "Response Latency"
+        name_tr: "Yanıt Süresinde Gecikme"
+        description: "Proxy response time longer than normal, possibly due to server overload."
+        detection_params: ["response_time_ms", "request_rate"]
+        root_cause: "Proxy resource exhaustion"
+        root_cause_tr: "Proxy kaynaklarının aşırı kullanımı"
+        root_cause_category: "resource"
+        severity: "medium"
+        remediation:
+          - "Clear proxy cache"
+          - "Temporarily block heavy-request IPs"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          response_time_ms: { multiplier: [2.0, 6.0], pattern: "gradual_rise" }
+          request_rate: { multiplier: [1.5, 3.0], pattern: "sustained_high" }
+
+  kubernetes_ingress:
+    name: "Kubernetes Ingress"
+    name_tr: "Kubernetes (Ingress)"
+    metrics:
+      - request_rate
+      - response_time_ms
+      - error_rate
+      - lb_utilization_pct
+      - connection_health_pct
+
+    scenarios:
+      - id: "K8I_001"
+        name: "High Error Rate"
+        name_tr: "Yüksek Hata Oranı"
+        description: "Ingress error rate increasing, indicating load balancer or connectivity issues."
+        detection_params: ["error_rate", "connection_health_pct", "lb_utilization_pct"]
+        root_cause: "Connection issues or configuration error"
+        root_cause_tr: "Bağlantı sorunları veya yapılandırma hatası"
+        root_cause_category: "config"
+        severity: "high"
+        remediation:
+          - "Reconfigure Ingress"
+          - "Redirect traffic"
+        anomaly_type: "spike"
+        affected_metrics:
+          error_rate: { additive: [0.05, 0.25], pattern: "sudden_spike" }
+          connection_health_pct: { multiplier: [0.4, 0.7], pattern: "gradual_drop" }
+          lb_utilization_pct: { additive: [15, 40], pattern: "sustained_high" }
+
+      - id: "K8I_002"
+        name: "Unbalanced Traffic Distribution"
+        name_tr: "Dengesiz Trafik Dağılımı"
+        description: "Traffic unevenly distributed to certain pods, indicating Ingress misconfiguration."
+        detection_params: ["request_rate", "lb_utilization_pct", "connection_health_pct"]
+        root_cause: "Misconfiguration or load balancing issue"
+        root_cause_tr: "Yanlış yapılandırma veya yük dengeleme sorunu"
+        root_cause_category: "config"
+        severity: "medium"
+        remediation:
+          - "Optimize traffic balancing settings"
+          - "Ensure equal distribution across pods"
+        anomaly_type: "oscillation"
+        affected_metrics:
+          lb_utilization_pct: { additive: [20, 45], pattern: "oscillation" }
+          request_rate: { multiplier: [1.2, 2.5], pattern: "oscillation" }
+
+  kubernetes_deployments:
+    name: "Kubernetes Deployments"
+    name_tr: "Kubernetes (Deployments)"
+    metrics:
+      - pod_count
+      - cpu_usage_pct
+      - memory_usage_pct
+      - pod_healthy_pct
+      - restart_count
+
+    scenarios:
+      - id: "K8D_001"
+        name: "Pod Restart Count Increase"
+        name_tr: "Pod Yeniden Başlatma Sayısında Artış"
+        description: "Pods restarting frequently for a deployment, indicating application or resource issues."
+        detection_params: ["restart_count", "cpu_usage_pct", "pod_healthy_pct"]
+        root_cause: "Resource insufficiency or application error"
+        root_cause_tr: "Kaynak yetersizliği veya uygulama hatası"
+        root_cause_category: "resource"
+        severity: "high"
+        remediation:
+          - "Restart pods"
+          - "Increase resource allocation"
+        anomaly_type: "spike"
+        affected_metrics:
+          restart_count: { additive: [3, 15], pattern: "step_increase" }
+          cpu_usage_pct: { additive: [15, 35], pattern: "gradual_rise" }
+          pod_healthy_pct: { multiplier: [0.5, 0.8], pattern: "gradual_drop" }
+
+      - id: "K8D_002"
+        name: "CPU Usage Increase"
+        name_tr: "CPU Kullanımının Artması"
+        description: "Deployment CPU usage consistently above threshold, indicating resource shortage."
+        detection_params: ["cpu_usage_pct", "memory_usage_pct", "pod_healthy_pct"]
+        root_cause: "High CPU demand or memory leak"
+        root_cause_tr: "Yüksek CPU gereksinimi veya bellek sızıntısı"
+        root_cause_category: "resource"
+        severity: "high"
+        remediation:
+          - "Auto-scale pod count (horizontal scaling)"
+          - "Update CPU limits"
+        anomaly_type: "sustained_high"
+        affected_metrics:
+          cpu_usage_pct: { additive: [20, 40], pattern: "sustained_high" }
+          memory_usage_pct: { additive: [10, 30], pattern: "gradual_rise" }
+
+  application:
+    name: "Application Layer"
+    name_tr: "Uygulama Katmanı"
+    metrics:
+      - qps
+      - error_rate
+      - response_time_ms
+      - transaction_count
+      - availability_pct
+
+    scenarios:
+      - id: "APP_001"
+        name: "Processing Time Increase"
+        name_tr: "İşlem Süresinde Artış"
+        description: "Processing response time above normal, indicating performance or database delay issues."
+        detection_params: ["response_time_ms", "error_rate", "transaction_count"]
+        root_cause: "Database latency or API error"
+        root_cause_tr: "Veri tabanı gecikmesi veya API hatası"
+        root_cause_category: "software"
+        severity: "high"
+        remediation:
+          - "Restart database connection"
+          - "Review API queries"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          response_time_ms: { multiplier: [2.0, 5.0], pattern: "gradual_rise" }
+          error_rate: { additive: [0.02, 0.10], pattern: "gradual_rise" }
+          transaction_count: { multiplier: [0.5, 0.8], pattern: "gradual_drop" }
+
+      - id: "APP_002"
+        name: "Error Rate Increase"
+        name_tr: "Hata Oranında Artış"
+        description: "Sudden increase in application error rate, caused by API or data processing failures."
+        detection_params: ["error_rate", "transaction_count", "qps"]
+        root_cause: "Application or API connection error"
+        root_cause_tr: "Uygulama veya API bağlantı hatası"
+        root_cause_category: "software"
+        severity: "critical"
+        remediation:
+          - "Limit API connection count"
+          - "Restart application"
+        anomaly_type: "spike"
+        affected_metrics:
+          error_rate: { additive: [0.10, 0.40], pattern: "sudden_spike" }
+          qps: { multiplier: [0.3, 0.6], pattern: "sudden_drop" }
+          availability_pct: { multiplier: [0.7, 0.9], pattern: "gradual_drop" }
+
+  database:
+    name: "Database"
+    name_tr: "Veritabanı"
+    metrics:
+      - query_response_ms
+      - connection_count
+      - active_sessions
+      - disk_io_mbps
+      - cache_hit_ratio
+      - slow_query_count
+
+    scenarios:
+      - id: "DB_001"
+        name: "Slow Query Increase"
+        name_tr: "Yavaş Sorguların Artışı"
+        description: "Significant increase in slow queries, indicating database server overload."
+        detection_params: ["slow_query_count", "disk_io_mbps", "query_response_ms"]
+        root_cause: "Intense query traffic or insufficient optimization"
+        root_cause_tr: "Yoğun sorgu trafiği veya yetersiz optimizasyon"
+        root_cause_category: "software"
+        severity: "high"
+        remediation:
+          - "Run slow query optimization script"
+          - "Apply query prioritization"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          slow_query_count: { multiplier: [3.0, 10.0], pattern: "gradual_rise" }
+          disk_io_mbps: { multiplier: [1.5, 3.0], pattern: "sustained_high" }
+          query_response_ms: { multiplier: [2.0, 6.0], pattern: "gradual_rise" }
+
+      - id: "DB_002"
+        name: "Connection Count Increase"
+        name_tr: "Bağlantı Sayısında Artış"
+        description: "Database connections much higher than normal, indicating overload or DDoS."
+        detection_params: ["connection_count", "active_sessions", "query_response_ms"]
+        root_cause: "High user traffic or DDoS attack"
+        root_cause_tr: "Yüksek kullanıcı girişi veya DDoS saldırısı"
+        root_cause_category: "network"
+        severity: "critical"
+        remediation:
+          - "Apply connection limiting"
+          - "Temporarily block heavy-request IPs"
+        anomaly_type: "spike"
+        affected_metrics:
+          connection_count: { multiplier: [3.0, 8.0], pattern: "sudden_spike" }
+          active_sessions: { multiplier: [2.5, 6.0], pattern: "sudden_spike" }
+          query_response_ms: { multiplier: [1.5, 4.0], pattern: "gradual_rise" }
+
+  storage:
+    name: "Storage"
+    name_tr: "Depolama (Storage)"
+    metrics:
+      - disk_usage_pct
+      - iops
+      - latency_ms
+      - disk_error_count
+
+    scenarios:
+      - id: "STR_001"
+        name: "High Disk Usage"
+        name_tr: "Yüksek Disk Kullanımı"
+        description: "Disk usage reaching 90%, due to insufficient storage or under-allocated resources."
+        detection_params: ["disk_usage_pct", "iops", "latency_ms"]
+        root_cause: "Insufficient disk space or log file accumulation"
+        root_cause_tr: "Yetersiz disk alanı veya log dosyalarının birikmesi"
+        root_cause_category: "resource"
+        severity: "high"
+        remediation:
+          - "Start disk cleanup"
+          - "Delete old log files"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          disk_usage_pct: { additive: [15, 30], pattern: "gradual_rise" }
+          iops: { multiplier: [1.5, 3.0], pattern: "sustained_high" }
+          latency_ms: { multiplier: [1.3, 2.5], pattern: "gradual_rise" }
+
+      - id: "STR_002"
+        name: "Latency Increase"
+        name_tr: "Gecikme Artışı"
+        description: "Storage latency increasing, indicating data access performance drop or disk bottleneck."
+        detection_params: ["latency_ms", "iops", "disk_error_count"]
+        root_cause: "Disk I/O bottleneck or disk failure"
+        root_cause_tr: "Disk I/O darboğazı veya disk arızası"
+        root_cause_category: "hardware"
+        severity: "high"
+        remediation:
+          - "Run I/O optimization script"
+          - "Check disk health status"
+        anomaly_type: "spike"
+        affected_metrics:
+          latency_ms: { multiplier: [3.0, 8.0], pattern: "sudden_spike" }
+          iops: { multiplier: [0.3, 0.6], pattern: "sudden_drop" }
+          disk_error_count: { additive: [5, 20], pattern: "step_increase" }
+
+  network:
+    name: "Network"
+    name_tr: "Ağ (Network)"
+    metrics:
+      - network_in_mbps
+      - network_out_mbps
+      - packet_loss_pct
+      - latency_ms
+      - connection_errors
+
+    scenarios:
+      - id: "NET_001"
+        name: "Packet Loss Increase"
+        name_tr: "Paket Kaybında Artış"
+        description: "Packet loss rate above normal, indicating network device or connectivity issue."
+        detection_params: ["packet_loss_pct", "connection_errors", "network_in_mbps"]
+        root_cause: "Network device issue or connectivity problem"
+        root_cause_tr: "Ağ cihazlarında sorun veya bağlantı problemi"
+        root_cause_category: "network"
+        severity: "high"
+        remediation:
+          - "Renew connections"
+          - "Restart faulty network devices"
+        anomaly_type: "spike"
+        affected_metrics:
+          packet_loss_pct: { additive: [2.0, 15.0], pattern: "sudden_spike" }
+          connection_errors: { multiplier: [3.0, 10.0], pattern: "sudden_spike" }
+          network_in_mbps: { multiplier: [0.4, 0.7], pattern: "gradual_drop" }
+
+      - id: "NET_002"
+        name: "Excessive Latency"
+        name_tr: "Aşırı Gecikme"
+        description: "Network latency above threshold, indicating congestion or configuration issues."
+        detection_params: ["latency_ms", "network_out_mbps", "connection_errors"]
+        root_cause: "Network congestion or configuration error"
+        root_cause_tr: "Ağ trafiğinde aşırı yoğunluk veya yapılandırma hatası"
+        root_cause_category: "network"
+        severity: "medium"
+        remediation:
+          - "Run traffic optimization script"
+          - "Analyze network traffic"
+        anomaly_type: "sustained_high"
+        affected_metrics:
+          latency_ms: { multiplier: [2.0, 5.0], pattern: "sustained_high" }
+          network_out_mbps: { multiplier: [0.5, 0.8], pattern: "gradual_drop" }
+          connection_errors: { additive: [5, 25], pattern: "gradual_rise" }
+
+  linux_vm:
+    name: "Linux VM"
+    name_tr: "Linux VM"
+    metrics:
+      - cpu_usage_pct
+      - memory_usage_pct
+      - disk_io_mbps
+      - load_average
+      - process_count
+      - network_io_mbps
+
+    scenarios:
+      - id: "VM_001"
+        name: "CPU Usage Surge"
+        name_tr: "CPU Kullanımı Artışı"
+        description: "CPU usage consistently above 90%, indicating resource overuse or optimization need."
+        detection_params: ["cpu_usage_pct", "load_average", "process_count"]
+        root_cause: "Resource exhaustion or abnormal process increase"
+        root_cause_tr: "Kaynak aşırı kullanımı veya anormal işlem artışı"
+        root_cause_category: "resource"
+        severity: "high"
+        remediation:
+          - "Terminate unnecessary processes"
+          - "Optimize CPU limits"
+        anomaly_type: "sustained_high"
+        affected_metrics:
+          cpu_usage_pct: { additive: [25, 45], pattern: "sustained_high" }
+          load_average: { multiplier: [2.0, 5.0], pattern: "sustained_high" }
+          process_count: { additive: [50, 200], pattern: "gradual_rise" }
+
+      - id: "VM_002"
+        name: "Memory Exhaustion"
+        name_tr: "Bellek Tükenmesi"
+        description: "Memory usage at 95% with increasing swap usage, indicating memory leak or shortage."
+        detection_params: ["memory_usage_pct", "disk_io_mbps", "load_average"]
+        root_cause: "Memory leak or high memory demand"
+        root_cause_tr: "Bellek sızıntısı veya yüksek bellek gereksinimi"
+        root_cause_category: "resource"
+        severity: "critical"
+        remediation:
+          - "Run memory cleanup script"
+          - "Monitor and optimize swap usage"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          memory_usage_pct: { additive: [20, 40], pattern: "gradual_rise" }
+          disk_io_mbps: { multiplier: [1.5, 3.0], pattern: "gradual_rise" }
+          load_average: { multiplier: [1.5, 3.0], pattern: "gradual_rise" }
+
+  linux_host:
+    name: "Linux Host (Physical Machine)"
+    name_tr: "Linux Host (Fiziksel Makine)"
+    metrics:
+      - cpu_usage_pct
+      - memory_usage_pct
+      - disk_usage_pct
+      - temperature_c
+      - fan_speed_rpm
+
+    scenarios:
+      - id: "HOST_001"
+        name: "CPU Temperature Increase"
+        name_tr: "CPU Sıcaklığında Artış"
+        description: "CPU temperature above normal, indicating hardware overheating or cooling issues."
+        detection_params: ["temperature_c", "fan_speed_rpm", "cpu_usage_pct"]
+        root_cause: "Hardware overheating or cooling problem"
+        root_cause_tr: "Donanım aşırı ısınması veya soğutma problemi"
+        root_cause_category: "hardware"
+        severity: "critical"
+        remediation:
+          - "Increase fan speed"
+          - "Terminate unnecessary processes"
+        anomaly_type: "gradual_rise"
+        affected_metrics:
+          temperature_c: { additive: [10, 25], pattern: "gradual_rise" }
+          fan_speed_rpm: { multiplier: [1.3, 1.8], pattern: "gradual_rise" }
+          cpu_usage_pct: { additive: [15, 35], pattern: "sustained_high" }
+
+      - id: "HOST_002"
+        name: "Disk Error Count Increase"
+        name_tr: "Disk Hata Sayısında Artış"
+        description: "Increasing disk errors, indicating disk failure or hardware degradation."
+        detection_params: ["disk_usage_pct", "temperature_c"]
+        root_cause: "Disk failure or wear-out"
+        root_cause_tr: "Disk arızası veya yıpranma"
+        root_cause_category: "hardware"
+        severity: "critical"
+        remediation:
+          - "Check disk health"
+          - "Backup data and send alerts"
+        anomaly_type: "step_increase"
+        affected_metrics:
+          disk_usage_pct: { additive: [5, 15], pattern: "step_increase" }
+          temperature_c: { additive: [3, 8], pattern: "gradual_rise" }
