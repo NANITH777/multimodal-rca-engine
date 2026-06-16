@@ -84,7 +84,7 @@ Preset sizes:
         preset = {"total": args.total, "anomaly_ratio": args.anomaly_ratio,
                   "progress_interval": max(100, args.total // 50)}
     else:
-        print("⚠️  No size specified. Use --size or --total. Defaulting to 'small'.")
+        print("  No size specified. Use --size or --total. Defaulting to 'small'.")
         preset = PRESETS["small"]
 
     # Override from args
@@ -113,9 +113,9 @@ Preset sizes:
         )
 
     elapsed = time.time() - start
-    print(f"\n🎯 Done in {elapsed:.1f}s ({elapsed/60:.1f}min)")
-    print(f"📂 Dataset at: {builder.output_dir}")
-    print(f"📋 Metadata:   {metadata_path}")
+    print(f"\n Done in {elapsed:.1f}s ({elapsed/60:.1f}min)")
+    print(f" Dataset at: {builder.output_dir}")
+    print(f" Metadata:   {metadata_path}")
 
 
 if __name__ == "__main__":

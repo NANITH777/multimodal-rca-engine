@@ -30,7 +30,7 @@ def ensure_directories():
     """Create all necessary project directories."""
     for d in [RAW_DIR, PARSED_DIR, PROCESSED_DIR, FIGURES_DIR]:
         d.mkdir(parents=True, exist_ok=True)
-    print("✅ All directories created successfully.")
+    print(" All directories created successfully.")
 
 
 def load_config(config_name="datasets.yaml"):
@@ -47,12 +47,12 @@ def download_file(url, dest_path, chunk_size=8192):
     """
     dest_path = Path(dest_path)
     if dest_path.exists():
-        print(f"⏭️  File already exists: {dest_path.name}")
+        print(f"  File already exists: {dest_path.name}")
         return dest_path
 
     dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-    print(f"⬇️  Downloading: {dest_path.name}")
+    print(f"  Downloading: {dest_path.name}")
     response = requests.get(url, stream=True, timeout=30)
     response.raise_for_status()
 
@@ -64,7 +64,7 @@ def download_file(url, dest_path, chunk_size=8192):
                 f.write(chunk)
                 pbar.update(len(chunk))
 
-    print(f"✅ Downloaded: {dest_path.name} ({total_size / 1e6:.1f} MB)")
+    print(f" Downloaded: {dest_path.name} ({total_size / 1e6:.1f} MB)")
     return dest_path
 
 
@@ -80,7 +80,7 @@ def extract_archive(archive_path, extract_dir=None):
     extract_dir = Path(extract_dir)
     extract_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"📦 Extracting: {archive_path.name}")
+    print(f" Extracting: {archive_path.name}")
 
     if archive_path.suffix == ".zip":
         with zipfile.ZipFile(archive_path, "r") as zf:
@@ -92,10 +92,10 @@ def extract_archive(archive_path, extract_dir=None):
         with tarfile.open(archive_path, "r") as tf:
             tf.extractall(extract_dir)
     else:
-        print(f"⚠️  Unknown archive format: {archive_path.suffix}")
+        print(f"  Unknown archive format: {archive_path.suffix}")
         return extract_dir
 
-    print(f"✅ Extracted to: {extract_dir}")
+    print(f" Extracted to: {extract_dir}")
     return extract_dir
 
 
@@ -139,13 +139,13 @@ def download_and_extract_dataset(dataset_key, config=None):
 
     # Extract — check if a named subdirectory exists OR files are flat
     if extract_dir.exists() and any(extract_dir.iterdir()):
-        print(f"⏭️  Already extracted: {name} (in subdirectory)")
+        print(f"  Already extracted: {name} (in subdirectory)")
         return extract_dir
     
     # Check if files are already extracted flat into RAW_DIR
     flat_files = get_dataset_files(dataset_key)
     if flat_files:
-        print(f"⏭️  Already extracted: {name} (flat in raw/)")
+        print(f"  Already extracted: {name} (flat in raw/)")
         return RAW_DIR
     
     # Extract
@@ -273,7 +273,7 @@ def read_log_file(filepath, max_lines=None, encoding="utf-8"):
                     break
                 lines.append(line.rstrip("\n"))
     except Exception as e:
-        print(f"❌ Error reading {filepath}: {e}")
+        print(f" Error reading {filepath}: {e}")
 
     return lines
 

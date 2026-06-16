@@ -51,7 +51,7 @@ class OllamaClient:
                 error_detail = e.response.text if e.response else str(e)
             except Exception:
                 pass
-            print(f"❌ Ollama error: {error_detail[:200]}")
+            print(f" Ollama error: {error_detail[:200]}")
             return {"error": error_detail[:200]}
 
     def _extract_json(self, text):
@@ -117,10 +117,10 @@ class OllamaClient:
         
         if result:
             result["reasoning"] = text[:500]
-            print(f"📋 Parsed from text: classification={result.get('classification', '?')}, confidence={result.get('confidence', '?')}")
+            print(f" Parsed from text: classification={result.get('classification', '?')}, confidence={result.get('confidence', '?')}")
             return result
             
-        print("⚠️ Warning: Could not parse response.")
+        print(" Warning: Could not parse response.")
         return {"raw_text": text, "classification": "UNKNOWN"}
 
 
@@ -132,7 +132,7 @@ class GeminiClient:
         self.model_name = default_model or os.getenv("DEFAULT_GEMINI_MODEL", "gemini-2.0-flash")
         
         if not self.api_key:
-            print("⚠️ WARNING: GEMINI_API_KEY not found in environment.")
+            print(" WARNING: GEMINI_API_KEY not found in environment.")
         else:
             genai.configure(api_key=self.api_key)
             self.model = genai.GenerativeModel(self.model_name)
@@ -162,7 +162,7 @@ class GeminiClient:
             # Fallback: use Ollama's smart parser
             return OllamaClient()._extract_json(response.text)
         except Exception as e:
-            print(f"❌ Gemini API error: {e}")
+            print(f" Gemini API error: {e}")
             return {"error": str(e)}
 
 
@@ -172,7 +172,7 @@ class LLMEngine:
     def __init__(self, backend=None):
         self.backend = backend or os.getenv("DEFAULT_LLM_BACKEND", "ollama")
         
-        print(f"🚀 Initializing LLMEngine (Backend: {self.backend.upper()})")
+        print(f" Initializing LLMEngine (Backend: {self.backend.upper()})")
         
         if self.backend.lower() == "ollama":
             self.client = OllamaClient()
@@ -188,7 +188,7 @@ class LLMEngine:
             self.client = OllamaClient()
         elif self.backend == "gemini":
             self.client = GeminiClient()
-        print(f"🔄 Switched backend to {self.backend.upper()}")
+        print(f" Switched backend to {self.backend.upper()}")
         
     def analyze(self, system_prompt, user_prompt, temperature=0.1):
         """Run analysis on the active backend with rate-limit awareness."""
@@ -207,12 +207,12 @@ class LLMEngine:
             error_msg = str(result.get("error", ""))
             if "429" in error_msg or "quota" in error_msg.lower():
                 wait = 65
-                print(f"⏳ Rate limited. Waiting {wait}s before retry {attempt+1}/{max_retries}...")
+                print(f" Rate limited. Waiting {wait}s before retry {attempt+1}/{max_retries}...")
                 time.sleep(wait)
             else:
-                print(f"⚠️ Attempt {attempt+1}/{max_retries} failed. Retrying in 3s...")
+                print(f" Attempt {attempt+1}/{max_retries} failed. Retrying in 3s...")
                 time.sleep(3)
             
-        print("❌ All attempts failed.")
+        print(" All attempts failed.")
         return result
 

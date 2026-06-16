@@ -107,7 +107,7 @@ class RegexLogParser:
         df = pd.DataFrame(records)
 
         success_rate = (1 - self.parse_failures / max(self.total_lines, 1)) * 100
-        print(f"\n📊 Parsing Results for {filepath.name}:")
+        print(f"\n Parsing Results for {filepath.name}:")
         print(f"   Total lines:     {self.total_lines:,}")
         print(f"   Parsed OK:       {len(records):,}")
         print(f"   Parse failures:  {self.parse_failures:,}")
@@ -226,7 +226,7 @@ class DrainLogParser:
         n_templates = len(self.templates)
         total_logs = sum(self.cluster_counts.values())
 
-        print(f"\n🔍 Drain Template Mining Summary:")
+        print(f"\n Drain Template Mining Summary:")
         print(f"   Total log messages processed: {total_logs:,}")
         print(f"   Unique templates discovered:  {n_templates}")
         print(f"   Avg logs per template:        {total_logs / max(n_templates, 1):.1f}")

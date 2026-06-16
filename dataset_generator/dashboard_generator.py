@@ -159,7 +159,7 @@ class DashboardGenerator:
             axes = axes.reshape(nrows, ncols)
 
         # Dashboard title
-        status_indicator = "🔴" if is_anomaly else "🟢"
+        status_indicator = "" if is_anomaly else ""
         title = f"  {layer_name}"
         if scenario_name:
             title += f"  —  {scenario_name}"

@@ -131,7 +131,7 @@ class DatasetBuilder:
                     output_path=dashboard_path
                 )
         except Exception as e:
-            print(f"  ⚠️ Dashboard generation failed for {sample_id}: {e}")
+            print(f"   Dashboard generation failed for {sample_id}: {e}")
             dashboard_path = None
 
         # 4) Generate Label
@@ -190,7 +190,7 @@ class DatasetBuilder:
             Path to metadata.csv
         """
         print(f"\n{'='*70}")
-        print(f"  🚀 MULTIMODAL RCA DATASET GENERATOR")
+        print(f"   MULTIMODAL RCA DATASET GENERATOR")
         print(f"{'='*70}")
         print(f"  Total samples:    {total_samples:,}")
         print(f"  Anomaly ratio:    {anomaly_ratio*100:.0f}%")
@@ -222,7 +222,7 @@ class DatasetBuilder:
         anomaly_per_scenario = n_anomaly // n_scenarios
         anomaly_remainder = n_anomaly % n_scenarios
 
-        print(f"  📊 Distribution:")
+        print(f"   Distribution:")
         print(f"     {n_layers} layers, {n_scenarios} anomaly scenarios")
         print(f"     ~{normal_per_layer} normal samples per layer")
         print(f"     ~{anomaly_per_scenario} anomaly samples per scenario")
@@ -233,7 +233,7 @@ class DatasetBuilder:
         start_time = time.time()
 
         # ---- Generate Normal Samples ----
-        print(f"  📝 Generating {n_normal:,} normal samples...")
+        print(f"   Generating {n_normal:,} normal samples...")
         for li, layer_key in enumerate(layer_keys):
             layer_config = layers[layer_key]
             count = normal_per_layer + (1 if li < normal_remainder else 0)
@@ -260,7 +260,7 @@ class DatasetBuilder:
                           f"{rate:.1f} samples/s | ETA: {eta:.0f}s")
 
         # ---- Generate Anomaly Samples ----
-        print(f"\n  🔴 Generating {n_anomaly:,} anomaly samples...")
+        print(f"\n   Generating {n_anomaly:,} anomaly samples...")
         for si, (layer_key, scenario) in enumerate(all_scenarios):
             layer_config = layers[layer_key]
             count = anomaly_per_scenario + (1 if si < anomaly_remainder else 0)
@@ -295,7 +295,7 @@ class DatasetBuilder:
         # ---- Summary ----
         elapsed = time.time() - start_time
         print(f"\n{'='*70}")
-        print(f"  ✅ DATASET GENERATION COMPLETE")
+        print(f"   DATASET GENERATION COMPLETE")
         print(f"{'='*70}")
         print(f"  Total samples generated: {sample_counter:,}")
         print(f"  Time elapsed:            {elapsed:.1f}s ({elapsed/60:.1f}min)")
@@ -312,7 +312,7 @@ class DatasetBuilder:
         """Print a summary of the dataset distribution."""
         df = pd.DataFrame(self.metadata_rows)
 
-        print(f"  📊 Dataset Distribution:")
+        print(f"   Dataset Distribution:")
         print(f"  {'─'*50}")
         print(f"  {'Category':<30s} {'Count':>8s} {'%':>7s}")
         print(f"  {'─'*50}")
@@ -354,7 +354,7 @@ class DatasetBuilder:
         Returns:
             Path to metadata.csv
         """
-        print(f"\n🧪 Generating SMALL TEST dataset ({samples_per_class} per class)...\n")
+        print(f"\n Generating SMALL TEST dataset ({samples_per_class} per class)...\n")
 
         layers = self._get_all_layers()
         self.metadata_rows = []
@@ -389,7 +389,7 @@ class DatasetBuilder:
             writer.writeheader()
             writer.writerows(self.metadata_rows)
 
-        print(f"✅ Test dataset generated: {sample_counter} samples")
+        print(f" Test dataset generated: {sample_counter} samples")
         print(f"   Metadata: {metadata_path}")
         self._print_distribution_summary()
 

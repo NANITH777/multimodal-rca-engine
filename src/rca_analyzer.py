@@ -53,7 +53,7 @@ class PromptBuilder:
             with open(templates_path, "r", encoding="utf-8") as f:
                 self.templates = json.load(f)
         else:
-            print(f"⚠️ Warning: Prompt template file {templates_path} not found!")
+            print(f" Warning: Prompt template file {templates_path} not found!")
 
     def build_anomaly_classification_prompt(self, session_text):
         """Build a system and user prompt for anomaly classification."""
@@ -118,8 +118,8 @@ class ResultEvaluator:
     @staticmethod
     def print_comparison_table(metrics_llm, metrics_baseline, llm_name="LLM"):
         """Prints a clean comparison table to the console."""
-        print(f"\n📊 --- PERFORMANS KARŞILAŞTIRMASI ---")
-        print(f"{'Metrik':<20} | {'Baseline (IF)':<15} | {llm_name:<15}")
+        print(f"\n --- PERFORMANCE COMPARISON ---")
+        print(f"{'Metric':<20} | {'Baseline (IF)':<15} | {llm_name:<15}")
         print("-" * 55)
         
         # Assuming baseline recall/precision from historical config or metrics argument
@@ -127,13 +127,13 @@ class ResultEvaluator:
         bl_rec = metrics_baseline.get('recall', 0.41)
         bl_f1 = metrics_baseline.get('f1', 0.44)
         
-        print(f"{'Anomali Precision':<20} | {bl_prec:<15.2f} | {metrics_llm['precision']:<15.2f}")
-        print(f"{'Anomali Recall':<20} | {bl_rec:<15.2f} | {metrics_llm['recall']:<15.2f}")
-        print(f"{'F1 Score (Ana)':<20} | {bl_f1:<15.2f} | {metrics_llm['f1']:<15.2f}")
+        print(f"{'Anomaly Precision':<20} | {bl_prec:<15.2f} | {metrics_llm['precision']:<15.2f}")
+        print(f"{'Anomaly Recall':<20} | {bl_rec:<15.2f} | {metrics_llm['recall']:<15.2f}")
+        print(f"{'F1 Score (Main)':<20} | {bl_f1:<15.2f} | {metrics_llm['f1']:<15.2f}")
         print("-" * 55)
-        
+
         diff = metrics_llm['f1'] - bl_f1
         if diff > 0:
-            print(f"✅ Sonuç: {llm_name}, Baseline modele göre +{diff*100:.1f} puan F1 artışı sağladı!")
+            print(f" Result: {llm_name} achieved a +{diff*100:.1f} point F1 gain over the baseline model!")
         else:
-            print(f"⚠️ Sonuç: {llm_name}, Baseline modele göre {diff*100:.1f} puan F1 düşüşü yaşadı.")
+            print(f" Result: {llm_name} had a {diff*100:.1f} point F1 drop compared to the baseline model.")

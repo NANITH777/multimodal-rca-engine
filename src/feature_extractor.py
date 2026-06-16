@@ -41,7 +41,7 @@ class LogFeatureExtractor:
             if pd.notna(block_id):
                 sessions[block_id] = group[event_col].tolist()
         
-        print(f"📊 Created {len(sessions):,} sessions from block IDs")
+        print(f" Created {len(sessions):,} sessions from block IDs")
         return sessions
 
     def group_by_time_window(self, df, timestamp_col="timestamp", event_col="event_id", window_minutes=5):
@@ -71,7 +71,7 @@ class LogFeatureExtractor:
         for window_id, group in df.groupby("window_id"):
             sessions[window_id] = group[event_col].tolist()
         
-        print(f"📊 Created {len(sessions):,} sessions from {window_minutes}-min windows")
+        print(f" Created {len(sessions):,} sessions from {window_minutes}-min windows")
         return sessions
 
     # ============================================
@@ -112,7 +112,7 @@ class LogFeatureExtractor:
         df = pd.DataFrame(rows, columns=columns, index=session_ids)
         df.index.name = "session_id"
 
-        print(f"📊 Event count matrix: {df.shape[0]} sessions × {df.shape[1]} event types")
+        print(f" Event count matrix: {df.shape[0]} sessions × {df.shape[1]} event types")
         return df, session_ids
 
     # ============================================
@@ -140,7 +140,7 @@ class LogFeatureExtractor:
         tfidf_matrix = self.tfidf_vectorizer.fit_transform(log_contents)
         feature_names = self.tfidf_vectorizer.get_feature_names_out()
 
-        print(f"📊 TF-IDF matrix: {tfidf_matrix.shape[0]} documents × {tfidf_matrix.shape[1]} features")
+        print(f" TF-IDF matrix: {tfidf_matrix.shape[0]} documents × {tfidf_matrix.shape[1]} features")
         return tfidf_matrix, feature_names
 
     # ============================================
@@ -174,7 +174,7 @@ class LogFeatureExtractor:
             session_ids.append(session_id)
 
         X = np.array(sequences)
-        print(f"📊 Sequence matrix: {X.shape[0]} sessions × {X.shape[1]} max_length")
+        print(f" Sequence matrix: {X.shape[0]} sessions × {X.shape[1]} max_length")
         return X, session_ids
 
     # ============================================
@@ -221,7 +221,7 @@ class LogFeatureExtractor:
 
         n_anomaly = sum(labels.values())
         n_normal = len(labels) - n_anomaly
-        print(f"📊 Labels loaded: {n_normal:,} normal, {n_anomaly:,} anomaly ({n_anomaly/len(labels)*100:.1f}%)")
+        print(f" Labels loaded: {n_normal:,} normal, {n_anomaly:,} anomaly ({n_anomaly/len(labels)*100:.1f}%)")
 
         return labels
 
@@ -243,7 +243,7 @@ class LogFeatureExtractor:
         X = feature_df.loc[common_ids]
         y = np.array([labels_dict[sid] for sid in common_ids])
 
-        print(f"📊 Aligned: {len(common_ids):,} sessions with both features and labels")
+        print(f" Aligned: {len(common_ids):,} sessions with both features and labels")
         print(f"   Normal:  {(y == 0).sum():,}")
         print(f"   Anomaly: {(y == 1).sum():,}")
 
