@@ -334,19 +334,6 @@ See [`requirements.txt`](requirements.txt) for pinned versions.
 
 ---
 
-## Citations
-
-```bibtex
-@inproceedings{zhu2023loghub,
-  title     = {Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics},
-  author    = {Zhu, Jieming and He, Shilin and He, Pinjia and Liu, Jinyang and Lyu, Michael R.},
-  booktitle = {ISSRE},
-  year      = {2023}
-}
-```
-
----
-
 ## License
 
 Released for **research and educational** purposes.
