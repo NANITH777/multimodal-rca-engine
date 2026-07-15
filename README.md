@@ -56,7 +56,7 @@ flowchart LR
     I --> ENG
 ```
 
-> **Implementation status of the data sources.** Metrics and logs are fully generated **and consumed** by the training pipeline. Dashboard images are **generated** (Grafana dark-theme renders) and are intended for the VLM / visual-analysis branch. The **Events** source and the closed-loop **self-healing** actuation are part of the target architecture; remediation today is produced as **recommendations** (from the scenario catalog and the Gemini layer), not yet executed automatically. See [Roadmap](#roadmap).
+> **Implementation status of the data sources.** Metrics and logs are fully generated **and consumed** by the training pipeline. Dashboard images are **generated** (Grafana dark-theme renders) and are now consumed by an independent dual-engine VLM branch (`models/vlm_engine.py`) that produces a pixel-level anomaly verdict; this visual verdict is not yet fused into the tabular ML decision (see [VLM Layer](#vlm-layer--dashboard-vision) and [Roadmap](#roadmap)). The **Events** source and the closed-loop **self-healing** actuation are part of the target architecture; remediation today is produced as **recommendations** (from the scenario catalog and the Gemini layer), not yet executed automatically.
 
 ---
 
@@ -79,7 +79,8 @@ multimodal-rca-engine/
 │   ├── data_loader.py              #   Multimodal feature extraction + noise injection
 │   ├── rca_models.py               #   AnomalyDetector, RCAClassifier, RemediationEngine
 │   ├── train.py                    #   End-to-end training pipeline
-│   └── gemini_explainer.py         #   Gemini 2.0 Flash explanation / remediation / chatbot
+│   ├── gemini_explainer.py         #   Gemini 2.0 Flash explanation / remediation / chatbot
+│   └── vlm_engine.py               #   Dual-engine VLM: Gemini Vision / local Ollama LLaVA on dashboard PNGs
 │
 ├── src/                           # Real-log pipeline utilities (used by notebooks/)
 │   ├── log_parser.py               #   Drain3-based log parsing
@@ -111,6 +112,7 @@ multimodal-rca-engine/
 │
 ├── results/                       # Figures, model_results.json, gemini_rca_report.md
 ├── demo_gemini.py                 # Standalone Gemini integration demo (no ML required)
+├── demo_vlm.py                    # Standalone VLM (dashboard vision) integration demo
 ├── requirements.txt
 └── README.md
 ```
@@ -257,6 +259,29 @@ python demo_gemini.py
 
 ---
 
+## VLM Layer — Dashboard Vision
+
+`models/vlm_engine.py` implements the future-work "VLM integration" item: it runs pixel-level anomaly analysis directly on the generated `dashboards/*.png` images, mirroring the dual-engine pattern used for text (local vs. cloud):
+
+- **Local engine** — Ollama running `llava:7b`. Fully private, no API calls, but slower on CPU-only hardware.
+- **Cloud engine** — Google Gemini Vision (`gemini-flash-latest` by default; configurable via `DEFAULT_GEMINI_VISION_MODEL`).
+
+Both engines return a structured JSON verdict: `visual_status` (`ANOMALY`/`NORMAL`), `visual_confidence`, `visual_pattern` (`spike` / `gradual_rise` / `sustained_high` / `oscillation` / `step_increase` / `none`), and a short `visual_explanation`, with the same rate-limit-aware retry logic as the text LLM engine.
+
+This visual verdict is currently produced **independently** of the tabular ML pipeline — it is not yet fused into the anomaly-detection decision (that fusion, and a quantitative benchmark across the two VLM engines, is the natural next step; see [Roadmap](#roadmap)).
+
+Try it on real generated dashboards:
+
+```bash
+# 1. Put your key in .env  (GEMINI_API_KEY=...)
+# 2. Pull the local vision model (optional, ~4.7GB)
+ollama pull llava:7b
+# 3. Run the demo
+python demo_vlm.py --backend both     # or --backend gemini / --backend ollama
+```
+
+---
+
 ## Real-Data Validation (LogHub)
 
 The project does not stop at synthetic data. Using the datasets configured in [`configs/datasets.yaml`](configs/datasets.yaml):
@@ -319,6 +344,7 @@ jupyter notebook
 - **Visualization:** Matplotlib, Seaborn, Plotly (Grafana-style dashboards)
 - **NLP:** TF-IDF (scikit-learn), NLTK
 - **LLM:** Google Gemini 2.0 Flash (`google-generativeai`)
+- **VLM:** Google Gemini Vision (`gemini-flash-latest`) + local Ollama LLaVA (`llava:7b`)
 - **Notebooks:** Jupyter, ipywidgets
 
 See [`requirements.txt`](requirements.txt) for pinned versions.
@@ -327,7 +353,8 @@ See [`requirements.txt`](requirements.txt) for pinned versions.
 
 ## Roadmap
 
-- [ ] **Wire dashboards into the pipeline** — add a visual (VLM/CNN) branch that consumes the generated dashboard images, fulfilling the "multimodal LLM **and VLM**" goal.
+- [x] **Wire dashboards into the pipeline** — dual-engine VLM branch (`models/vlm_engine.py`, Gemini Vision / local Ollama LLaVA) now consumes the generated dashboard images and produces an independent visual anomaly verdict.
+- [ ] **Fuse the VLM verdict into the RCA decision** — combine the visual score with the tabular ML score (metric + log) for true three-modality exploitation, and run a quantitative benchmark (accuracy/F1, latency, JSON parse rate) across the two VLM engines analogous to the existing LLM benchmark.
 - [ ] **Add a synthetic Events modality** — discrete event streams (e.g. `OOMKilled`, `Deployment scaled`, `Alert fired`) aligned to `anomaly_start_idx`, as a true fourth source.
 - [ ] **Close the self-healing loop** — execute remediation actions (restart / rollback / scale) in a sandboxed environment and feed outcomes back into model improvement.
 - [ ] **Expand real-data validation** to BGL and OpenStack, not just HDFS.
