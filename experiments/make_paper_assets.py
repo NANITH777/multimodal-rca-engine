@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from common import OUT, ROOT
+from common import OUT, ROOT, load_features
 from matplotlib.patches import FancyBboxPatch
 from PIL import Image
 
@@ -103,6 +103,31 @@ table("real", "lcccccc", rows, r"Model & \multicolumn{2}{c}{HDFS (5-fold)} & \mu
 t = pd.read_csv(OUT / "bgl_protocols.csv")
 table("bgl", "lcccc", [[r.unit, r.split, f"{int(r.n):,}", f"{r.test_rate:.3f}", f"{r.f1:.3f}"] for _, r in t.iterrows()],
       r"Unit & Split & $n$ & Test anomaly rate & $F_1$")
+
+# Clean-metric sensitivity, scenario catalogue, SHAP families ------------------------------
+n = pd.read_csv(OUT / "noise_sensitivity_runs.csv").groupby("combination").f1.agg(["mean", "std"])
+nt = pd.read_csv(OUT / "noise_sensitivity_tests.csv")
+pairs = [("$M$", "M", "Mc"), ("$M+L$", "M+L", "Mc+L"), ("$M+S$", "M+S", "Mc+S")]
+table("noise", "lcc", [[lab, pm(piv[a].mean(), piv[a].std()), pm(n.loc[b, "mean"], n.loc[b, "std"])] for lab, a, b in pairs],
+      r"Combination & Noisy statistics & Clean statistics")
+print("Mc+S vs Mc", nt.a_only_correct.mean(), nt.b_only_correct.mean(), (nt.mcnemar_p < .05).sum())
+
+import yaml  # noqa: E402
+
+layers = yaml.safe_load(open(ROOT / "configs" / "anomaly_scenarios.yaml", encoding="utf8"))["layers"]
+esc = lambda s: s.replace("_", r"\_")
+rows = []
+for v in layers.values():
+    for s_ in v["scenarios"]:
+        pats = sorted({c["pattern"] for c in s_["affected_metrics"].values()})
+        rows.append([esc(s_["id"]), v["name"].split(" (")[0], s_["name"], s_["root_cause_category"], s_["severity"],
+                     len(s_["affected_metrics"]).__str__(), esc(", ".join(pats))])
+table("scenarios", "lllllcl", rows, "ID & Layer & Scenario & Category & Severity & Metrics hit & Injected patterns")
+
+sh = pd.read_csv(OUT / "shap_importance.csv")
+fam = sh.groupby("family").mean_abs_shap.sum()
+print("SHAP shares", (fam / fam.sum()).round(3).to_dict(), sh.head(5).feature.tolist())
+print("metric stats", sorted({str(x).split("_", 1)[1] for x in load_features()["metric_names"]}), "log", list(load_features()["log_names"]))
 
 # LLaVA tables ---------------------------------------------------------------------------
 pv = pd.read_csv(ROOT / "results" / "modality_ablation_n150_per_sample.csv")

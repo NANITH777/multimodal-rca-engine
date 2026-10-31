@@ -95,3 +95,6 @@ docs/
 !data/processed/
 !data/parsed/**
 !data/processed/**
+
+# ---------- Manuscript drafts ----------
+paper/

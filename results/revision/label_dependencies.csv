@@ -1,0 +1,6 @@
+given,target,max_values_per_group,n_groups,n_target
+scenario,layer,1,22,11
+scenario,root,1,22,5
+scenario,severity,1,22,3
+layer,root,2,11,5
+layer,severity,2,11,3

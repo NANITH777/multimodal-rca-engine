@@ -1,0 +1,6 @@
+seed,comparison,a_only_correct,b_only_correct,mcnemar_p
+0,Mc+S vs Mc,34,26,0.36629400670329104
+1,Mc+S vs Mc,33,31,0.9006532462520334
+2,Mc+S vs Mc,0,0,1.0
+3,Mc+S vs Mc,18,23,0.5327092552361137
+4,Mc+S vs Mc,25,20,0.5514843298025198
