@@ -1,0 +1,13 @@
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Model & \multicolumn{2}{c}{HDFS (5-fold)} & \multicolumn{2}{c}{BGL (chronological)} & \multicolumn{2}{c}{OpenStack (5-fold)} \\ & $F_1$ & PR-AUC & $F_1$ & PR-AUC & $F_1$ & PR-AUC \\
+\midrule
+XGBoost & 0.998 & 1.000 & 0.541 & 0.543 & 0.018 & 0.097 \\
+Random Forest & 0.998 & 1.000 & 0.541 & 0.538 & 0.018 & 0.107 \\
+Gradient Boosting & 0.998 & 1.000 & 0.526 & 0.432 & 0.000 & 0.096 \\
+KNN (k=5) & 0.997 & 0.997 & 0.451 & 0.396 & 0.000 & 0.095 \\
+LightGBM & 0.998 & 1.000 & 0.271 & 0.433 & 0.106 & 0.105 \\
+MLP & 0.997 & 1.000 & 0.273 & 0.142 & 0.170 & 0.104 \\
+Logistic Regression & 0.980 & 0.993 & 0.281 & 0.418 & 0.018 & 0.102 \\
+\bottomrule
+\end{tabular}
